@@ -6,21 +6,14 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 from torchvision import datasets
-import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
 from encoder import VariationalEncoder
 from decoder import Decoder
-from PIL import Image
 
-
-# Hyper-parameters
 BATCH_SIZE = 1
 LATENT_SPACE = 95
 
-
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-
-
 class VariationalAutoencoder(nn.Module):
     def __init__(self, latent_dims):
         super(VariationalAutoencoder, self).__init__()

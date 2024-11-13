@@ -46,17 +46,17 @@ class VariationalAutoencoder(nn.Module):
 
 def main():
 
-    data_dir = 'autoencoder/dataset/'
-
+    data_dir = r"E:\pythonCarlaPPO\autoencoder\dataset"
     test_transforms = transforms.Compose([transforms.ToTensor()])
 
-    test_data = datasets.ImageFolder(data_dir+'test', transform=test_transforms)
+    test_data = datasets.ImageFolder(os.path.join(data_dir, 'test'), transform=test_transforms)
 
     testloader = torch.utils.data.DataLoader(test_data, batch_size=BATCH_SIZE)
     
     model = VariationalAutoencoder(latent_dims=LATENT_SPACE).to(device)
     model.load()
     count = 1
+    os.makedirs('autoencoder/reconstructed', exist_ok=True)
     with torch.no_grad(): # No need to track the gradients
         for x, _ in testloader:
             # Move tensor to the proper device

@@ -1,10 +1,7 @@
 import os
 import torch
 import torch.nn as nn
-
-
 device = torch.device("cpu")
-
 class VariationalEncoder(nn.Module):
     def __init__(self, latent_dims):  
         super(VariationalEncoder, self).__init__()
@@ -59,5 +56,5 @@ class VariationalEncoder(nn.Module):
         torch.save(self.state_dict(), self.model_file)
 
     def load(self):
-        #self.load_state_dict(torch.load(self.model_file))
+
         self.load_state_dict(torch.load(self.model_file, map_location=torch.device('cpu')))

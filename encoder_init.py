@@ -1,4 +1,3 @@
-import sys
 import torch
 from autoencoder.encoder import VariationalEncoder
 
@@ -14,10 +13,7 @@ class EncodeState():
 
         for params in self.conv_encoder.parameters():
             params.requires_grad = False
-        # except:
-        #     print('Encoder could not be initialized.')
-        #     sys.exit()
-    
+
     def process(self, observation):
         image_obs = torch.tensor(observation[0], dtype=torch.float).to(self.device)
         image_obs = image_obs.unsqueeze(0)

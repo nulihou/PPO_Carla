@@ -35,6 +35,7 @@ class VariationalAutoencoder(nn.Module):
         return self.decoder(z)
     
     def save(self):
+        os.makedirs(os.path.dirname(self.model_file), exist_ok=True)
         torch.save(self.state_dict(), self.model_file)
         self.encoder.save()
         self.decoder.save()
@@ -79,20 +80,19 @@ def test(model, testloader):
 
 def main():
 
-    data_dir = 'autoencoder/dataset/'
 
+    data_dir = r"E:\pythonCarlaPPO\autoencoder\dataset"
     writer = SummaryWriter(f"runs/"+"auto-encoder")
     
     # Applying Transformation
     train_transforms = transforms.Compose([transforms.RandomRotation(30),transforms.RandomHorizontalFlip(),transforms.ToTensor()])
     test_transforms = transforms.Compose([transforms.ToTensor()])
 
-    train_data = datasets.ImageFolder(data_dir+'train', transform=train_transforms)
-    test_data = datasets.ImageFolder(data_dir+'test', transform=test_transforms)
-    
+    train_data = datasets.ImageFolder(os.path.join(data_dir, 'train'), transform=train_transforms)
+    test_data = datasets.ImageFolder(os.path.join(data_dir, 'test'), transform=test_transforms)
+
     m=len(train_data)
     train_data, val_data = random_split(train_data, [int(m-m*0.2), int(m*0.2)])
-    
 
     # Data Loading
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
@@ -102,7 +102,7 @@ def main():
     model = VariationalAutoencoder(latent_dims=LATENT_SPACE).to(device)
     optim = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
-    print(f'Selected device :) :) :) {device}')
+    print(f'Selected device : {device}')
 
     for epoch in range(NUM_EPOCHS):
         train_loss = train(model,trainloader, optim)

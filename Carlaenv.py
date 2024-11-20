@@ -39,7 +39,6 @@ class CarlaEnv:
         self.sensor_list = []  # 传感器列表
         self.actor_list = []  # actor列表
 
-
     def reset(self):
         if len(self.actor_list) != 0 or len(self.sensor_list) != 0:
             self.client.apply_batch([carla.command.DestroyActor(x) for x in self.sensor_list])

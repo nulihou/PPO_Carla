@@ -11,7 +11,7 @@ from encoder import VariationalEncoder
 from decoder import Decoder
 
 BATCH_SIZE = 1
-LATENT_SPACE = 95
+LATENT_SPACE = 95 #潜在空间维度设置为 95 可能过大，导致模型倾向于记忆而不是泛化特征。我们可以尝试将其减少到 32 或 64。
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 class VariationalAutoencoder(nn.Module):

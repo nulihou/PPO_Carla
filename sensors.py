@@ -6,11 +6,6 @@ import carla
 
 RGB_CAMERA = 'sensor.camera.rgb'
 SSC_CAMERA = 'sensor.camera.semantic_segmentation'
-
-# ---------------------------------------------------------------------|
-# ------------------------------- CAMERA |
-# ---------------------------------------------------------------------|
-
 class CameraSensor():
 
     def __init__(self, vehicle):
@@ -43,11 +38,6 @@ class CameraSensor():
         placeholder1 = placeholder.reshape((image.width, image.height, 4))
         target = placeholder1[:, :, :3]
         self.front_camera.append(target)#/255.0)
-
-
-# ---------------------------------------------------------------------|
-# ------------------------------- ENV CAMERA |
-# ---------------------------------------------------------------------|
 
 class CameraSensorEnv:
 
@@ -87,11 +77,6 @@ class CameraSensorEnv:
         self.display.blit(self.surface, (0, 0))
         pygame.display.flip()
 
-
-
-# ---------------------------------------------------------------------|
-# ------------------------------- COLLISION SENSOR|
-# ---------------------------------------------------------------------|
 
 # It's an important as it helps us to tract collisions
 # It also helps with resetting the vehicle after detecting any collisions

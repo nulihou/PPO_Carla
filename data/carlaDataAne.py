@@ -33,11 +33,22 @@ def collect_data_fixed_interval(client, output_dir, num_frames=1000,map_name='',
     # 生成车辆和语义分割相机
     vehicle_bp = blueprint_library.filter('model3')[0]
     spawn_point = random.choice(world.get_map().get_spawn_points())
+
+    if spawn_point is None:
+        spawn_point = random.choice(world.get_map().get_spawn_points())
     print(f"生成车辆的起始位置：{spawn_point.location}")
     vehicle = world.spawn_actor(vehicle_bp, spawn_point)
 
     # 启用自动驾驶模式
-    vehicle.set_autopilot(True)
+    # 设置traffic manager
+    tm = client.get_trafficmanager(tm_port)
+    tm.set_synchronous_mode(True)
+    # 是否忽略红绿灯
+    # tm.ignore_lights_percentage(ego_vehicle, 100)
+    # 如果限速30km/h -> 30*(1-10%)=27km/h
+    tm.global_percentage_speed_difference(10.0)
+    #ego_vehicle.set_autopilot(True, tm.get_port())
+    vehicle.set_autopilot(True,tm.get_port())
     print("车辆已启用自动驾驶模式")
     camera_bp = blueprint_library.find('sensor.camera.semantic_segmentation')
     camera_transform = carla.Transform(carla.Location(x=1.5, z=2.4))  # 摄像头安装在车辆前方
@@ -122,14 +133,15 @@ class SteeringAngleDataset(Dataset):
     """
     自定义 PyTorch 数据集，用于加载 Carla 数据集，包括图像和方向盘角度。
     """
-
-    def __init__(self, csv_file, transform=None):
+    def __init__(self, csv_file, root_dir, transform=None):
         """
         初始化数据集。
         :param csv_file: 包含图像路径和方向盘角度的 CSV 文件路径
+        :param root_dir: 图像文件的根目录
         :param transform: 图像的预处理变换
         """
         self.data = pd.read_csv(csv_file)
+        self.root_dir = root_dir  # 根目录
         self.transform = transform if transform else transforms.Compose([
             transforms.ToTensor()  # 将图片转换为 Tensor 格式
         ])
@@ -140,20 +152,12 @@ class SteeringAngleDataset(Dataset):
     def __getitem__(self, idx):
         """
         获取索引为 idx 的数据项。
-        :param idx: 索引
-        :return: 图像张量和方向盘角度
         """
-        # 获取图像路径和方向盘角度
-        img_path = self.data.iloc[idx, 0]
+        img_path = os.path.join(self.root_dir, self.data.iloc[idx, 0])  # 拼接路径
         steering_angle = self.data.iloc[idx, 1]
-
-        # 加载图像
         image = Image.open(img_path).convert('RGB')
-
-        # 应用图像预处理
         if self.transform:
             image = self.transform(image)
-
         return image, torch.tensor([steering_angle], dtype=torch.float32)
 
 
@@ -164,18 +168,21 @@ if __name__ == "__main__":
 
     # 采集数据
     output_dir = "E:/pythonCarlaPPO/data/output_data"
-    num_frames = 1000  # 总帧数
+    num_frames = 2000  # 总帧数
     interval = 1     # 固定时间间隔（秒）
     warmup_time = 5.0  # 自动驾驶模式启动后的预热时间（秒）
-    save_interval = 10
+    save_interval = 5
 
     #maps = ['Town01', 'Town02', 'Town03', 'Town04', 'Town05']  # 采集的地图
-    map_name='Town01'
+    #'Town01'com, 'Town02'com, 'Town03'com, 'Town04', 'Town05'
+    tm_port=8000
+    map_name='Town04'
     collect_data_fixed_interval(client, output_dir, num_frames, map_name ,interval)
 
     # 加载并测试 SteeringAngleDataset
-    csv_file = os.path.join(output_dir, "steering_angles.csv")
-    dataset = SteeringAngleDataset(csv_file)
+    csv_file = os.path.join(output_dir, map_name, "steering_angles.csv")
+    image_dir = os.path.join(output_dir, map_name, "images")
+    dataset = SteeringAngleDataset(csv_file, image_dir)
     dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 
     print("\n测试加载数据集:")

@@ -174,7 +174,7 @@ if __name__ == "__main__":
     save_interval = 5
 
     #maps = ['Town01', 'Town02', 'Town03', 'Town04', 'Town05']  # 采集的地图
-    #'Town01'com, 'Town02'com, 'Town03'com, 'Town04', 'Town05'
+    #'Town01'com, 'Town02'com, 'Town03'com, 'Town04', 'Town05'com
     tm_port=8000
     map_name='Town04'
     collect_data_fixed_interval(client, output_dir, num_frames, map_name ,interval)

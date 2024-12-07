@@ -30,8 +30,10 @@ class VariationalAutoencoder(nn.Module):
         self.decoder = Decoder(latent_dims)
 
     def forward(self, x):
+        print(f"Input tensor shape to encoder: {x.shape}")
         x = x.to(device)
         z = self.encoder(x)
+        print(f"Output tensor shape from encoder: {z.shape}")
         return self.decoder(z)
     
     def save(self):

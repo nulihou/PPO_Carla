@@ -18,7 +18,6 @@ def collect_data_fixed_interval(client, output_dir, num_frames=1000,map_name='',
     :param num_frames: 采集的帧数
     :param interval: 采样时间间隔（秒）
     """
-
     print(f"\n正在采集地图 {map_name} 的数据...")
     # 连接到 Carla 世界
     world = client.load_world(map_name)
